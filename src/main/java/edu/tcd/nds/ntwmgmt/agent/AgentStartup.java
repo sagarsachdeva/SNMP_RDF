@@ -5,16 +5,20 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 
+import edu.tcd.nds.ntwmgmt.infobase.HostResourcesMib;
 import org.snmp4j.agent.DuplicateRegistrationException;
 
 import edu.tcd.nds.ntwmgmt.infobase.AgentInfo;
 import edu.tcd.nds.ntwmgmt.infobase.DbInfo;
+import org.snmp4j.agent.mo.DefaultMOFactory;
 
 public class AgentStartup {
 
 	static AgentInfo agentInfo;
 
 	static DbInfo dbInfo;
+
+	static HostResourcesMib hrInfo;
 
 	public static void main(String[] args)
 			throws IOException, InterruptedException, NumberFormatException, DuplicateRegistrationException {
@@ -30,6 +34,7 @@ public class AgentStartup {
 
 		registerAgentInfo(Integer.parseInt(port), agent);
 		registerDbInfo(agent);
+		registerHrInfo(agent);
 
 		System.out.println("Agent started");
 		while (true) {
@@ -60,5 +65,10 @@ public class AgentStartup {
 		agentInfo.setPort(port);
 		agentInfo.setStartupTime(new Date());
 		agentInfo.registerManagerObject(agent);
+	}
+
+	private static void registerHrInfo(SNMPAgent agent) throws DuplicateRegistrationException {
+		hrInfo = new HostResourcesMib(DefaultMOFactory.getInstance());
+		hrInfo.registerMOs(agent.getServer(),agent.getDefaultContext());
 	}
 }
