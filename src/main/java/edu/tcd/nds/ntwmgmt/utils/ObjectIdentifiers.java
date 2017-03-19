@@ -20,6 +20,4 @@ public class ObjectIdentifiers {
 	public static final OID DB_START_TIME_IDENTIFIER = new OID(".1.3.7.1.2.1.2.6.1");
 	public static final OID DB_STATUS_IDENTIFIER = new OID(".1.3.7.1.2.1.2.7.1");
 
-
-	public static final OID TEST_OID = new OID(".1.3.6.1.2.1.25.1.2.0");
 }
