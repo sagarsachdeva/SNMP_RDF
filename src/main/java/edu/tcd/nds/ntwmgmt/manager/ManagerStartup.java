@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.tcd.nds.ntwmgmt.infobase.HostResourcesMib;
 import edu.tcd.nds.ntwmgmt.utils.Constants;
 import edu.tcd.nds.ntwmgmt.utils.ObjectIdentifiers;
+import org.snmp4j.smi.OID;
 
 public class ManagerStartup {
 
@@ -39,6 +41,8 @@ public class ManagerStartup {
 				System.out.println("Version : " + manager.getAsString(ObjectIdentifiers.DB_VERSION_IDENTIFIER));
 				System.out.println("UpTime : " + manager.getAsString(ObjectIdentifiers.DB_UPTIME_IDENTIFIER));
 				System.out.println("Startup Time : " + manager.getAsString(ObjectIdentifiers.DB_START_TIME_IDENTIFIER));
+
+				System.out.println("test host resource MIB : " + manager.getAsString(HostResourcesMib.oidHrSystemUptime));
 			}
 			Thread.sleep(15000);
 		}
