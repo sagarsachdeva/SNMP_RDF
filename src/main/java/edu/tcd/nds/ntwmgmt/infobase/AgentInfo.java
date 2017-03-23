@@ -52,8 +52,8 @@ public class AgentInfo implements BaseInterface {
 				.addColumnType(SMIConstants.SYNTAX_OCTET_STRING, MOAccessImpl.ACCESS_READ_WRITE)
 				.addColumnType(SMIConstants.SYNTAX_INTEGER, MOAccessImpl.ACCESS_READ_WRITE)
 				.addRowValue(new OctetString(this.ipAddress))
-				.addRowValue(new OctetString(Constants.DATE_FORMATTER.format(this.startupTime)))
-				.addRowValue(new Integer32(this.port));
+				.addRowValue(new Integer32(this.port))
+				.addRowValue(new OctetString(Constants.DATE_FORMATTER.format(this.startupTime)));
 
 		agent.getServer().register(builder.build(), null);
 	}

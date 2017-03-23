@@ -1,5 +1,8 @@
 package edu.tcd.nds.ntwmgmt.infobase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.snmp4j.agent.BaseAgent;
 import org.snmp4j.agent.DuplicateRegistrationException;
 import org.snmp4j.agent.mo.MOAccessImpl;
@@ -17,7 +20,7 @@ public class DbInfo implements BaseInterface {
 
 	private int port;
 
-	private String dbName;
+	private List<String> dbNames = new ArrayList<String>();
 
 	private String version;
 
@@ -37,12 +40,19 @@ public class DbInfo implements BaseInterface {
 		this.ipAddress = ipAddress;
 	}
 
-	public String getDbName() {
-		return dbName;
+	public String getDbNames() {
+		StringBuilder sb = new StringBuilder();
+		String prefix = "";
+		for (String n : dbNames) {
+			sb.append(prefix);
+			prefix = ", ";
+			sb.append(n);
+		}
+		return sb.toString();
 	}
 
-	public void setDbName(String dbName) {
-		this.dbName = dbName;
+	public void setDbName(List<String> dbNames) {
+		this.dbNames = dbNames;
 	}
 
 	public int getPort() {
@@ -96,19 +106,19 @@ public class DbInfo implements BaseInterface {
 				.addColumnType(SMIConstants.SYNTAX_OCTET_STRING, MOAccessImpl.ACCESS_READ_WRITE)
 				.addColumnType(SMIConstants.SYNTAX_OCTET_STRING, MOAccessImpl.ACCESS_READ_WRITE)
 				.addRowValue(new OctetString(this.ipAddress)).addRowValue(new Integer32(this.port))
-				.addRowValue(new OctetString(this.dbName)).addRowValue(new OctetString(this.version))
+				.addRowValue(new OctetString(getDbNames())).addRowValue(new OctetString(this.version))
 				.addRowValue(new Integer32(this.upTime)).addRowValue(new OctetString(this.startDateTime))
 				.addRowValue(new OctetString(this.status));
 
 		agent.getServer().register(builder.build(), null);
-
+		
 	}
 
 	public void updateManagerObject(BaseAgent agent) throws DuplicateRegistrationException {
 		Variable[] rowElements = builder.getTableRows().get(0);
 		rowElements[0] = new OctetString(this.ipAddress);
 		rowElements[1] = new Integer32(this.port);
-		rowElements[2] = new OctetString(this.dbName);
+		rowElements[2] = new OctetString(getDbNames());
 		rowElements[3] = new OctetString(this.version);
 		rowElements[4] = new Integer32(this.upTime);
 		rowElements[5] = new OctetString(this.startDateTime);

@@ -1,6 +1,9 @@
 package edu.tcd.nds.ntwmgmt.agent;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -10,7 +13,13 @@ import org.snmp4j.agent.DuplicateRegistrationException;
 
 import edu.tcd.nds.ntwmgmt.infobase.AgentInfo;
 import edu.tcd.nds.ntwmgmt.infobase.DbInfo;
+import edu.tcd.nds.ntwmgmt.utils.Constants;
 import org.snmp4j.agent.mo.DefaultMOFactory;
+
+import org.apache.jena.query.DatasetAccessor;
+import org.apache.jena.query.DatasetAccessorFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 public class AgentStartup {
 
@@ -26,6 +35,8 @@ public class AgentStartup {
 			System.out.println("Please provide Ip address and port as arguments");
 			System.exit(1);
 		}
+		loadDBData();
+		
 		String ipAddress = args[0];
 		String port = args[1];
 
@@ -44,6 +55,17 @@ public class AgentStartup {
 
 	}
 
+	private static void loadDBData() throws FileNotFoundException {
+		DatasetAccessor accessor;
+		accessor = DatasetAccessorFactory.createHTTP(Constants.STORE_DATA_URL);
+		
+		InputStream in = new FileInputStream(Constants.RDF_DATA);;
+		Model m = ModelFactory.createDefaultModel();
+		m.read(in, "", "RDF/XML");
+		
+		accessor.putModel(m);
+	}
+	
 	private static void updateManagerObject(SNMPAgent agent)
 			throws UnknownHostException, DuplicateRegistrationException {
 		StoreInfoFetcher.fetchStoreDetails(dbInfo);
