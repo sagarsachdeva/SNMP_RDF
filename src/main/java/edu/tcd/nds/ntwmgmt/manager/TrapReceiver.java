@@ -23,6 +23,8 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 import org.snmp4j.util.MultiThreadedMessageDispatcher;
 import org.snmp4j.util.ThreadPool;
 
+import edu.tcd.nds.ntwmgmt.utils.ObjectIdentifiers;
+
 public class TrapReceiver implements CommandResponder {
 
 	public synchronized void listen(TransportIpAddress address) throws IOException {
@@ -53,7 +55,7 @@ public class TrapReceiver implements CommandResponder {
 		snmp.addCommandResponder(this);
 
 		transport.listen();
-//		System.out.println("Listening on " + address);
+		// System.out.println("Listening on " + address);
 
 	}
 
@@ -62,13 +64,18 @@ public class TrapReceiver implements CommandResponder {
 	 * specified in the listen() method
 	 */
 	public synchronized void processPdu(CommandResponderEvent cmdRespEvent) {
-//		System.out.println("Received PDU...");
+		// System.out.println("Received PDU...");
 		PDU pdu = cmdRespEvent.getPDU();
 		if (pdu != null) {
-			System.out.println("------------------TRAP--------------------");
-			System.out.println("Trap Type = " + pdu.getType());
-			System.out.println("State changed: " + pdu.getVariableBindings().get(2));
-			System.out.println("At:" + pdu.getVariableBindings().get(0).toString().split("=")[1]);
+			System.out.println("------------------NOTIFICATION--------------------");
+			System.out.println(pdu.getErrorStatus());
+			if (pdu.getErrorStatus() == 1) {
+				System.out.println("System Online for: " + pdu.getVariableBindings().get(2) + " seconds");
+				System.out.println("Recorded on:" + pdu.getVariableBindings().get(0).toString().split("=")[1]);
+			}else if(pdu.getType() == PDU.NOTIFICATION){
+				System.out.println("State changed: " + pdu.getVariableBindings().get(2));
+				System.out.println("At:" + pdu.getVariableBindings().get(0).toString().split("=")[1]);
+			}
 		}
 	}
 }

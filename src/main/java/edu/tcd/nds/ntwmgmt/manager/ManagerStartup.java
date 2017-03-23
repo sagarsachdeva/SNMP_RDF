@@ -20,7 +20,7 @@ public class ManagerStartup {
 		}
 		
 		TrapReceiver snmp4jTrapReceiver = new TrapReceiver();
-		UdpAddress trapAdr = new UdpAddress("localhost/162");
+		UdpAddress trapAdr = new UdpAddress("localhost/1337");
 	
 
 		while (true) {

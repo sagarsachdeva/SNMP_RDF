@@ -6,33 +6,29 @@ import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.TransportMapping;
+import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
-import org.snmp4j.smi.IpAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
+import edu.tcd.nds.ntwmgmt.utils.ObjectIdentifiers;
+
 public class TrapSender {
 
 	public static final String community = "public";
 
-	// Sending Trap for sysLocation of RFC1213
-	public static final OID Oid = new OID(".1.3.7.1.2.1.2.7.1");
-
+	//
 	// IP of Local Host
 	public static final String ipAddress = "127.0.0.1";
 
-	// Ideally Port 162 should be used to send receive Trap, any other available
-	// Port can be used
-	public static final int port = 162;
-	
+	public static final int port = 1337;
+
 	UdpAddress adr = new UdpAddress(ipAddress + "/" + port);
-	/**
-	 * This methods sends the V1 trap to the Localhost in port 162
-	 */
-	public void sendTrap_Version2(String status) {
+
+	public void sendTrap_Version2(ResponseEvent status, int trapcode) {
 		try {
 			// Create Transport Mapping
 			TransportMapping transport = new DefaultUdpTransportMapping();
@@ -51,16 +47,26 @@ public class TrapSender {
 
 			// need to specify the system up time
 			pdu.add(new VariableBinding(SnmpConstants.sysUpTime, new OctetString(new Date().toString())));
-			pdu.add(new VariableBinding(SnmpConstants.snmpTrapOID, Oid));
-//			pdu.add(new VariableBinding(SnmpConstants.snmpTrapAddress, new IpAddress(ipAddress)));
-//
-			pdu.add(new VariableBinding(Oid, new OctetString(status)));
-			pdu.setType(PDU.NOTIFICATION);
-			
+
+			// pdu.add(new VariableBinding(SnmpConstants.snmpTrapAddress, new
+			// IpAddress(ipAddress)));
+			//
+			if (trapcode == 1) {
+				pdu.add(new VariableBinding(SnmpConstants.snmpTrapOID, ObjectIdentifiers.DB_STATUS_IDENTIFIER));
+				pdu.add(new VariableBinding(ObjectIdentifiers.DB_STATUS_IDENTIFIER,
+						new OctetString(status.getResponse().get(0).getVariable().toString())));
+				pdu.setType(PDU.NOTIFICATION);
+			} else {
+				pdu.add(new VariableBinding(SnmpConstants.snmpTrapOID, ObjectIdentifiers.DB_UPTIME_IDENTIFIER));
+				pdu.add(new VariableBinding(ObjectIdentifiers.DB_UPTIME_IDENTIFIER,
+						new OctetString(status.getResponse().get(1).getVariable().toString())));
+				pdu.setErrorStatus(1);
+				pdu.setType(PDU.NOTIFICATION);
+
+			}
 
 			// Send the PDU
 			Snmp snmp = new Snmp(transport);
-			System.out.println("Sending V2 Trap... Check Wheather NMS is Listening or not? ");
 			snmp.send(pdu, cTarget);
 			snmp.close();
 		} catch (Exception e) {

@@ -64,7 +64,9 @@ public class AgentStartup {
 		System.out.println("Agent started");
 		while (true) {
 			if (getStatusChange()) {
-				trapV2.sendTrap_Version2(getTrapStatus());
+				trapV2.sendTrap_Version2(getTrapStatus(), 1);
+			} else if (getTrapStatus().getResponse().get(1).getVariable().toInt() % 20 == 0 && getTrapStatus().getResponse().get(1).getVariable().toInt() !=0) {
+				trapV2.sendTrap_Version2(getTrapStatus(), 0);
 			}
 			Thread.sleep(1000);
 			updateManagerObject(agent);
@@ -73,15 +75,15 @@ public class AgentStartup {
 	}
 
 	private static boolean getStatusChange() throws IOException {
-		if (getTrapStatus().equals(lastStatus)) {
-			lastStatus = getTrapStatus();
+		if (getTrapStatus().getResponse().get(0).getVariable().toString().equals(lastStatus)) {
+			lastStatus = getTrapStatus().getResponse().get(0).getVariable().toString();
 			return false;
 		}
-		lastStatus = getTrapStatus();
+		lastStatus = getTrapStatus().getResponse().get(0).getVariable().toString();
 		return true;
 	}
 
-	private static String getTrapStatus() throws IOException {
+	private static ResponseEvent getTrapStatus() throws IOException {
 		Snmp snmp;
 		TransportMapping transport = new DefaultUdpTransportMapping();
 		snmp = new Snmp(transport);
@@ -95,10 +97,11 @@ public class AgentStartup {
 		target.setVersion(SnmpConstants.version2c);
 		PDU pdu = new PDU();
 		pdu.add(new VariableBinding(ObjectIdentifiers.DB_STATUS_IDENTIFIER));
+		pdu.add(new VariableBinding(ObjectIdentifiers.DB_UPTIME_IDENTIFIER));
 		pdu.setType(PDU.GET);
 		ResponseEvent event = snmp.send(pdu, target, null);
 
-		return event.getResponse().get(0).getVariable().toString();
+		return event;
 	}
 
 	private static void loadDBData() throws FileNotFoundException {
