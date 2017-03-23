@@ -102,15 +102,18 @@ public class AgentStartup {
 	}
 
 	private static void loadDBData() throws FileNotFoundException {
-		DatasetAccessor accessor;
-		accessor = DatasetAccessorFactory.createHTTP(Constants.STORE_DATA_URL);
+		try {
+			DatasetAccessor accessor;
+			accessor = DatasetAccessorFactory.createHTTP(Constants.STORE_DATA_URL);
 
-		InputStream in = new FileInputStream(Constants.RDF_DATA);
-		;
-		Model m = ModelFactory.createDefaultModel();
-		m.read(in, "", "RDF/XML");
+			InputStream in = new FileInputStream(Constants.RDF_DATA);
+			;
+			Model m = ModelFactory.createDefaultModel();
+			m.read(in, "", "RDF/XML");
 
-		accessor.putModel(m);
+			accessor.putModel(m);
+		} catch (Exception e) {
+		}
 	}
 
 	private static void updateManagerObject(SNMPAgent agent)
