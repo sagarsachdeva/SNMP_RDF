@@ -96,7 +96,7 @@ public class DbInfo implements BaseInterface {
 	}
 
 	@Override
-	public void registerManagerObject(BaseAgent agent) throws DuplicateRegistrationException {
+	public void registerManagedObject(BaseAgent agent) throws DuplicateRegistrationException {
 		builder = new MOTableBuilder(ObjectIdentifiers.BASE_DB_INFO_IDENTIFIER)
 				.addColumnType(SMIConstants.SYNTAX_OCTET_STRING, MOAccessImpl.ACCESS_READ_WRITE)
 				.addColumnType(SMIConstants.SYNTAX_INTEGER, MOAccessImpl.ACCESS_READ_WRITE)

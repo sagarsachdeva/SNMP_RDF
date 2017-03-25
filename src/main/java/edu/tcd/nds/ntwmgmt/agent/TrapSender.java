@@ -8,7 +8,6 @@ import org.snmp4j.Snmp;
 import org.snmp4j.TransportMapping;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
-import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
@@ -30,7 +29,7 @@ public class TrapSender {
 
 	public void sendTrap_Version2(ResponseEvent status, int trapcode) {
 		try {
-			// Create Transport Mapping
+//			// Create Transport Mapping
 			TransportMapping transport = new DefaultUdpTransportMapping();
 			transport.listen();
 

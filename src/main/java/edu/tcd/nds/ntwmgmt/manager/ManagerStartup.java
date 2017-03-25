@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.tcd.nds.ntwmgmt.infobase.HostResourcesMib;
+import org.snmp4j.smi.UdpAddress;
+
 import edu.tcd.nds.ntwmgmt.utils.Constants;
 import edu.tcd.nds.ntwmgmt.utils.ObjectIdentifiers;
-import org.snmp4j.smi.OID;
-import org.snmp4j.smi.UdpAddress;
 
 public class ManagerStartup {
 
@@ -18,15 +17,13 @@ public class ManagerStartup {
 		for (String endpoint : Constants.agentEndpoints) {
 			managerEndpoints.add(new SNMPManager(endpoint));
 		}
-		
+
 		TrapReceiver snmp4jTrapReceiver = new TrapReceiver();
 		UdpAddress trapAdr = new UdpAddress("localhost/1337");
-	
 
 		while (true) {
 			for (SNMPManager manager : managerEndpoints) {
-				
-				
+
 				System.out.println("------------------Agent--------------------");
 
 				System.out.println();
@@ -36,6 +33,10 @@ public class ManagerStartup {
 				System.out.println("Agent Port : " + manager.getAsString(ObjectIdentifiers.AGENT_PORT_IDENTIFIER));
 				System.out.println(
 						"Startup Time : " + manager.getAsString(ObjectIdentifiers.AGENT_START_TIME_IDENTIFIER));
+				System.out.println(
+						"CPU usage : " + manager.getAsString(ObjectIdentifiers.AGENT_CPU_USAGE_IDENTIFIER) + "%");
+				System.out.println("Memory Usage : "
+						+ manager.getAsString(ObjectIdentifiers.AGENT_MEMORY_USAGE_IDENTIFIER) + " MB");
 
 				System.out.println();
 
@@ -49,8 +50,6 @@ public class ManagerStartup {
 				System.out.println("UpTime : " + manager.getAsString(ObjectIdentifiers.DB_UPTIME_IDENTIFIER));
 				System.out.println("Startup Time : " + manager.getAsString(ObjectIdentifiers.DB_START_TIME_IDENTIFIER));
 
-				System.out.println("test host resource MIB : " + manager.getAsString(HostResourcesMib.oidHrSystemUptime));
-				
 				snmp4jTrapReceiver.listen(trapAdr);
 			}
 			Thread.sleep(15000);

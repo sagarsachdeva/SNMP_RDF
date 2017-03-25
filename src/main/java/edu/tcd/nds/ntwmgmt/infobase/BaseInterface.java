@@ -5,5 +5,5 @@ import org.snmp4j.agent.DuplicateRegistrationException;
 
 public interface BaseInterface {
 
-	public void registerManagerObject(BaseAgent agent) throws DuplicateRegistrationException;
+	public void registerManagedObject(BaseAgent agent) throws DuplicateRegistrationException;
 }
